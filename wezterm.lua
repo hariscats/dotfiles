@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
 local config = wezterm.config_builder()
+local is_macos = wezterm.target_triple:find("apple-darwin", 1, true) ~= nil
 
 -- A soft, Everforest-inspired dark palette for prose and code.
 local palette = {
@@ -69,7 +70,6 @@ config.initial_rows = 45
 config.window_padding = { left = 8, right = 8, top = 6, bottom = 6 }
 config.window_background_opacity = 1.0
 config.text_background_opacity = 1.0
-config.macos_window_background_blur = 0
 -- Preserve the background and syntax contrast in inactive splits.
 config.inactive_pane_hsb = { saturation = 1.0, brightness = 1.0 }
 config.use_fancy_tab_bar = false
@@ -87,34 +87,52 @@ config.scrollback_lines = 50000
 config.window_close_confirmation = "AlwaysPrompt"
 config.automatically_reload_config = true
 
--- Left Option sends Alt shortcuts; right Option can type accented prose.
-config.send_composed_key_when_left_alt_is_pressed = false
-config.send_composed_key_when_right_alt_is_pressed = true
+if is_macos then
+  config.macos_window_background_blur = 0
+  -- Left Option sends Alt shortcuts; right Option can type accented prose.
+  config.send_composed_key_when_left_alt_is_pressed = false
+  config.send_composed_key_when_right_alt_is_pressed = true
+end
+
+local mods = {
+  primary = is_macos and "CMD" or "CTRL|SHIFT",
+  secondary = is_macos and "CMD|SHIFT" or "CTRL|SHIFT|ALT",
+  utility = is_macos and "CMD|SHIFT" or "CTRL|SHIFT",
+  navigate = is_macos and "CMD|ALT" or "CTRL|SHIFT",
+  resize = is_macos and "CMD|CTRL" or "CTRL|SHIFT|ALT",
+}
 
 -- Keep the default shell, environment, and editor shortcuts intact.
 -- Splits use the current domain and WezTerm's working-directory inheritance.
 config.keys = {
-  { key = "d", mods = "CMD", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-  { key = "d", mods = "CMD|SHIFT", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-  { key = "Enter", mods = "CMD|SHIFT", action = act.TogglePaneZoomState },
-  { key = "w", mods = "CMD", action = act.CloseCurrentPane({ confirm = true }) },
+  { key = "d", mods = mods.primary, action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+  { key = "d", mods = mods.secondary, action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+  { key = "Enter", mods = mods.utility, action = act.TogglePaneZoomState },
+  { key = "w", mods = mods.primary, action = act.CloseCurrentPane({ confirm = true }) },
 
-  { key = "LeftArrow", mods = "CMD|ALT", action = act.ActivatePaneDirection("Left") },
-  { key = "RightArrow", mods = "CMD|ALT", action = act.ActivatePaneDirection("Right") },
-  { key = "UpArrow", mods = "CMD|ALT", action = act.ActivatePaneDirection("Up") },
-  { key = "DownArrow", mods = "CMD|ALT", action = act.ActivatePaneDirection("Down") },
-  { key = "LeftArrow", mods = "CMD|CTRL", action = act.AdjustPaneSize({ "Left", 5 }) },
-  { key = "RightArrow", mods = "CMD|CTRL", action = act.AdjustPaneSize({ "Right", 5 }) },
-  { key = "UpArrow", mods = "CMD|CTRL", action = act.AdjustPaneSize({ "Up", 5 }) },
-  { key = "DownArrow", mods = "CMD|CTRL", action = act.AdjustPaneSize({ "Down", 5 }) },
+  { key = "LeftArrow", mods = mods.navigate, action = act.ActivatePaneDirection("Left") },
+  { key = "RightArrow", mods = mods.navigate, action = act.ActivatePaneDirection("Right") },
+  { key = "UpArrow", mods = mods.navigate, action = act.ActivatePaneDirection("Up") },
+  { key = "DownArrow", mods = mods.navigate, action = act.ActivatePaneDirection("Down") },
+  { key = "LeftArrow", mods = mods.resize, action = act.AdjustPaneSize({ "Left", 5 }) },
+  { key = "RightArrow", mods = mods.resize, action = act.AdjustPaneSize({ "Right", 5 }) },
+  { key = "UpArrow", mods = mods.resize, action = act.AdjustPaneSize({ "Up", 5 }) },
+  { key = "DownArrow", mods = mods.resize, action = act.AdjustPaneSize({ "Down", 5 }) },
 
-  { key = "f", mods = "CMD", action = act.Search({ CaseInSensitiveString = "" }) },
+  { key = "f", mods = mods.primary, action = act.Search({ CaseInSensitiveString = "" }) },
   -- Copy mode: h/j/k/l to move, v to select, y to copy, Esc to leave.
-  { key = "x", mods = "CMD|SHIFT", action = act.ActivateCopyMode },
+  { key = "x", mods = mods.utility, action = act.ActivateCopyMode },
   -- Label and copy paths, URLs, hashes, and other matches from visible output.
-  { key = "Space", mods = "CMD|SHIFT", action = act.QuickSelect },
-  { key = "p", mods = "CMD|SHIFT", action = act.ActivateCommandPalette },
-  { key = "phys:Comma", mods = "CMD|SHIFT", action = act.ReloadConfiguration },
+  { key = "Space", mods = mods.utility, action = act.QuickSelect },
+  { key = "p", mods = mods.utility, action = act.ActivateCommandPalette },
+  { key = is_macos and "phys:Comma" or "r", mods = mods.utility, action = act.ReloadConfiguration },
+  {
+    key = "s",
+    mods = mods.utility,
+    action = wezterm.action_callback(function(window, pane)
+      require("scrollback").open(window, pane)
+    end),
+  },
 }
 
 return config
