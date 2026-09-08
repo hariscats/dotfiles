@@ -105,31 +105,37 @@ the plugin lockfile does not manage them.
 
 ## Writing theme
 
-`colors/paper.lua` builds on Neovim's bundled `quiet` theme, without another
-plugin. It uses a warm off-white page (`#faf9f6`), charcoal text (`#3f3a34`),
-muted accents, and restrained heading/code backgrounds. Spelling feedback
-remains enabled, with underlines rather than recoloring the whole word.
+The default `forest` theme is a soft, Everforest-inspired dark palette matching
+the current WezTerm configuration at `~/.config/wezterm/wezterm.lua`. It uses a
+charcoal-green background (`#2d353b`), warm text (`#d3c6aa`), and muted green,
+teal, gold, and rose accents for code. Normal text has approximately 7.4:1
+contrast; comments remain readable rather than fading into the background.
+Headings use weight instead of bright colors, with subtle backgrounds for code
+and completion menus. Spelling feedback stays underlined, without recoloring
+the whole word.
 
-Normal/Visual mode uses a steady light-gray block (`#d3cec4`) with dark text
-(`#3f3a34`) so the character under the cursor remains readable. Insert mode uses
-a darker charcoal bar (`#68645e`). `guicursor` explicitly selects the appropriate
-highlight for each mode. Ghostty uses full cursor opacity to preserve text
-contrast and `adjust-cursor-thickness` for bar width; terminal cursor protocols
-do not carry Neovim's GUI percentage widths.
+Normal/Visual mode uses a steady sage-green block (`#a7c080`) with dark text
+(`#2d353b`) so the character under the cursor remains readable. Insert mode uses
+a warm light bar (`#d3c6aa`). Cursor, selection, and all 16 ANSI colors match
+WezTerm. Terminal rendering controls the bar's actual thickness; Neovim's
+`guicursor` percentage widths apply to GUIs, not terminal cursor protocols.
 
-Ghostty's matching theme is `~/.config/ghostty/themes/paper`; keep its background,
-foreground, cursor, selection, and 16 ANSI colors synchronized with the Neovim
-theme. The macOS Ghostty config selects `theme = paper` and `window-theme = light`,
-with an opaque background and no blur so desktop colors cannot tint the page.
-Fonts, font size, and line spacing are unchanged.
+`colors/forest.lua` and the light alternative `colors/paper.lua` use the shared
+highlight definitions in `lua/config/theme.lua`, built on Neovim's bundled
+`quiet` theme. No new plugins or runtime dependency on a terminal configuration
+are needed; the colors work on macOS and Windows. Fonts and terminal settings
+are unchanged.
 
-To include Ghostty's palette in the theme regression script:
+Use `:colorscheme forest` to apply the dark theme immediately, or restart Neovim.
+`:colorscheme paper` selects the previous warm-white theme for the current
+session. To make Paper the default again, change the colorscheme in `init.lua`.
+The existing Ghostty Paper theme is unchanged and still matches the light option,
+not Forest.
+
+The theme regression script covers both palettes. Optionally compare the local
+WezTerm configuration with Forest, or the Ghostty theme with Paper:
 
 ```sh
+nvim --headless -u NONE -l tests/theme.lua --wezterm="$HOME/.config/wezterm/wezterm.lua"
 nvim --headless -u NONE -l tests/theme.lua ~/.config/ghostty/themes/paper
 ```
-
-Restart Neovim to load the default theme, or use `:colorscheme paper` to change
-only the theme in an existing session. Reload Ghostty with Cmd+Shift+Comma for
-the new colors; changing background opacity requires quitting and reopening
-Ghostty on macOS. Save your editor buffers before quitting the terminal.

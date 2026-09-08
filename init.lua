@@ -37,14 +37,14 @@ o.confirm = true
 o.laststatus = 3
 o.signcolumn = "yes"
 o.cursorline = true
--- Explicit colors in every mode; Ghostty controls the TUI bar's pixel thickness.
+-- Explicit colors in every mode; the terminal controls the bar's pixel thickness.
 o.guicursor = "n-v-c-sm:block-Cursor/lCursor,i-ci-ve:ver40-CursorInsert,"
   .. "r-cr-o:hor30-CursorInsert,t:block-TermCursor,a:blinkon0"
 o.winborder = "rounded"
 vim.opt.fillchars = { eob = " ", vert = "│", horiz = "─", fold = " " }
 
--- Warm-white paper, with a matching Ghostty theme and no theme plugin.
-vim.cmd.colorscheme("paper")
+-- Soft dark colors matching WezTerm, without a theme plugin.
+vim.cmd.colorscheme("forest")
 
 --------------------------------------------------------------------------
 -- Diagnostics

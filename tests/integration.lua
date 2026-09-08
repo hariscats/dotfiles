@@ -50,6 +50,21 @@ api.nvim_buf_set_lines(0, 0, -1, false, {
   "# Heading", "", "> [!NOTE]", "> Body", "", "```python", "answer = 42", "```",
 })
 vim.wait(200)
+assert(vim.g.colors_name == "forest" and vim.o.background == "dark")
+local function assert_forest_highlights()
+  local function hl(name)
+    return api.nvim_get_hl(0, { name = name, link = false })
+  end
+  assert(hl("Normal").bg == 0x2d353b and hl("Normal").fg == 0xd3c6aa)
+  assert(hl("NormalFloat").bg == 0x272e33 and hl("Pmenu").bg == 0x272e33)
+  assert(hl("Cursor").bg == 0xa7c080 and hl("Cursor").fg == 0x2d353b)
+  assert(hl("CursorInsert").bg == 0xd3c6aa)
+  for level = 1, 6 do
+    assert(hl("RenderMarkdownH" .. level).fg == 0xd3c6aa)
+    assert(hl("RenderMarkdownH" .. level .. "Bg").bg == 0x272e33)
+  end
+end
+assert_forest_highlights()
 assert(vim.b.prose_mode and vim.wo.wrap)
 assert(vim.treesitter.highlighter.active[api.nvim_get_current_buf()])
 vim.treesitter.get_parser():parse(true)
@@ -82,10 +97,15 @@ for _, key in ipairs({ "<CR>", "<C-Y>", "<C-E>", "<C-P>", "<C-N>", "<C-Space>", 
   assert(cmp.get_config().mapping[key], "missing explicit completion mapping " .. key)
 end
 assert(package.loaded["nvim-autopairs"], "autopairs must still load")
+vim.cmd.colorscheme("paper")
+vim.cmd.colorscheme("forest")
+vim.wait(200)
+assert_forest_highlights()
 assert(#errors == 0, table.concat(errors, "\n"))
 vim.notify = original_notify
 for _, client in ipairs(vim.lsp.get_clients()) do
-  client:stop(true)
+  client:stop()
 end
+vim.wait(2000, function() return #vim.lsp.get_clients() == 0 end)
 vim.g.config_integration_ok = true
 print("Plugin integration assertions passed")
