@@ -57,7 +57,8 @@ config.colors = {
   },
 }
 
-config.font = wezterm.font_with_fallback({ "IBM Plex Mono", "Menlo" })
+-- Bundled with WezTerm on both macOS and Windows.
+config.font = wezterm.font("JetBrains Mono")
 config.font_size = 13
 config.line_height = 1.08
 config.harfbuzz_features = { "calt=0", "liga=0", "dlig=0" }

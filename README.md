@@ -1,16 +1,18 @@
 # WezTerm configuration
 
-A muted, Everforest-inspired dark theme for writing and coding, with IBM Plex
-Mono at 13 pt, gentle line spacing, and 50,000 lines of scrollback. This config
-is macOS-oriented and does not change your shell environment or Neovim theme.
+A muted, Everforest-inspired dark theme for writing and coding, with JetBrains
+Mono at 13 pt, gentle line spacing, and 50,000 lines of scrollback. The font is
+bundled with WezTerm on macOS and Windows; no separate font installation is
+required. Shortcuts remain macOS-oriented, and this config does not change your
+shell environment or Neovim theme.
 
 ## Set up another Mac
 
-Install WezTerm, the font, and the GitHub CLI using Homebrew:
+Install WezTerm and the GitHub CLI using Homebrew:
 
 ```sh
 brew install gh
-brew install --cask wezterm font-ibm-plex-mono
+brew install --cask wezterm
 ```
 
 Authenticate with a GitHub account that has access to this private repository:
@@ -22,8 +24,7 @@ gh repo clone hariscats/wezterm ~/.config/wezterm
 ```
 
 If `~/.config/wezterm` already exists, move it to a uniquely named backup before
-cloning. A separate `~/.wezterm.lua` can take precedence over this config;
-preserve and move that file aside too if present.
+cloning.
 
 Open WezTerm. Saved configuration edits reload automatically; `Cmd+Shift+,`
 also reloads the configuration. No terminal plugins are required.
