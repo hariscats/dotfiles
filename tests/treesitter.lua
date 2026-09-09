@@ -8,6 +8,11 @@ local original_notify_once = vim.notify_once
 local available = false
 local load_error
 
+for _, lang in ipairs({ "python", "go", "gomod", "gosum", "gowork", "markdown", "markdown_inline" }) do
+  assert(vim.list_contains(ts.languages, lang), lang .. " must be explicitly provisioned")
+end
+assert(vim.treesitter.language.get_lang("golang") == "go", "Go fences must accept the golang alias")
+
 vim.api.nvim_get_runtime_file = function()
   return available and { "/test/parser.so" } or {}
 end
@@ -47,6 +52,12 @@ assert(messages[2].level == vim.log.levels.ERROR, "load errors are not missing-p
 load_error = nil
 ts.start(0)
 assert(#starts == 1 and starts[1].lang == "python", "start an available parser")
+for _, ft in ipairs({ "go", "gomod", "gosum", "gowork", "markdown" }) do
+  vim.bo.filetype = ft
+  ts.start(0)
+  assert(starts[#starts].lang == ft, "start the parser for " .. ft)
+end
+vim.bo.filetype = "python"
 vim.treesitter.start = function() error("invalid highlights query") end
 ts.start(0)
 vim.wait(20)

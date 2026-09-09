@@ -2,8 +2,12 @@ local M = {}
 
 M.languages = {
   "lua", "vim", "vimdoc", "query", "bash", "diff",
-  "python", "toml", "markdown", "markdown_inline", "yaml",
+  "python", "go", "gomod", "gosum", "gowork",
+  "toml", "markdown", "markdown_inline", "yaml",
 }
+
+-- Accept the common Markdown fence alias without a second parser.
+vim.treesitter.language.register("go", "golang")
 
 local function report(message, level)
   vim.schedule(function()

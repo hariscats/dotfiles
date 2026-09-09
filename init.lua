@@ -43,8 +43,8 @@ o.guicursor = "n-v-c-sm:block-Cursor/lCursor,i-ci-ve:ver40-CursorInsert,"
 o.winborder = "rounded"
 vim.opt.fillchars = { eob = " ", vert = "│", horiz = "─", fold = " " }
 
--- Soft dark colors matching WezTerm, without a theme plugin.
-vim.cmd.colorscheme("forest")
+-- Tokyo Night Moon colors matching WezTerm, without a theme plugin.
+vim.cmd.colorscheme("tokyonight-moon")
 
 --------------------------------------------------------------------------
 -- Diagnostics

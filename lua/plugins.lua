@@ -33,7 +33,7 @@ return require("lazy").setup({
   --------------------------------------------------------------------
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPre", "BufNewFile" },
+    ft = { "python" },
     dependencies = { "hrsh7th/cmp-nvim-lsp" },
     config = function()
       -- Applies to every server, so each vim.lsp.config below carries only
@@ -169,9 +169,19 @@ return require("lazy").setup({
       end
 
       return {
+        render_modes = { "n", "c" },
+        debounce = 50,
+        -- Keep the cursor line rendered when reading; editing modes show source.
+        anti_conceal = { enabled = false },
+        win_options = {
+          conceallevel = { default = 0, rendered = 3 },
+          concealcursor = { default = "", rendered = "nc" },
+        },
         heading = {
-          icons = { "# ", "## ", "### ", "#### ", "##### ", "###### " },
-          width = "block",
+          icons = { "" },
+          position = "inline",
+          width = "full",
+          left_pad = 1,
           sign = false,
         },
         code = {
@@ -210,6 +220,8 @@ return require("lazy").setup({
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
+    -- render-markdown probes cmp; do not load completion just to read a note.
+    module = false,
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",

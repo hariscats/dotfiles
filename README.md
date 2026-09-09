@@ -55,7 +55,7 @@ process. Keep Tree-sitter on `main` for Neovim 0.12, not the frozen `master`.
 Review the documented callout/link overrides in `lua/plugins.lua` when updating
 render-markdown.
 
-Before accepting an update, open representative Python and Markdown files,
+Before accepting an update, open representative Python, Go, and Markdown files,
 exercise completion, formatting, prose toggling, and splits, and run:
 
 ```vim
@@ -76,6 +76,7 @@ With the plugins and Python servers installed, also exercise the full config:
 ```sh
 nvim --headless -u init.lua -i NONE -n -S tests/integration.lua \
   '+if !get(g:, "config_integration_ok", 0) | cquit | endif' '+qa!'
+nvim --headless -u NONE -i NONE -n -l tests/markdown.lua
 ```
 
 Commit the new lockfile together with any configuration changes. If executable
@@ -87,6 +88,39 @@ and lockfile from version control. Run `:Lazy restore`, exit Neovim, and provisi
 parsers in a fresh process again. Restore external executable versions separately;
 the plugin lockfile does not manage them.
 
+## Syntax highlighting
+
+The existing Tree-sitter plugin provides highlighting for Python, Go, and
+Markdown, including inline Markdown and Python/Go fenced code blocks. Both
+`go` and `golang` fence labels use the Go parser. The parser list also includes
+`gomod`, `gosum`, and `gowork` for Go module and workspace files.
+
+The local theme distinguishes purple keywords and booleans, blue functions,
+cyan types and fields, green strings, and amber numbers and parameters. Ordinary
+variables keep the normal text color, punctuation and comments stay muted, and
+Python's LSP semantic colors follow the same palette. Markdown headings use
+amber, green, blue, purple, cyan, and rose accents by level, including when the
+heading markers are hidden. Links and quotes are cyan, bullets and completed
+tasks green, and pending tasks amber. Bold text and inline code use amber;
+italic emphasis uses purple. Source and rendered views share these colors, while
+fenced blocks keep the embedded language's syntax colors.
+
+No extra theme, highlighting, or Go LSP plugins are required. The plugin list,
+completion behavior, and native indentation remain unchanged. On another
+machine, run `:ConfigParsers` and restart Neovim after pulling these changes;
+parsers are never downloaded automatically during editing.
+
+## Daily-note startup
+
+Opening a Markdown note loads Tree-sitter and the renderer, not the Python LSP
+configuration or completion/snippet plugins. Python LSP setup loads on the
+Python filetype; completion remains deferred until Insert mode. The renderer's
+optional completion probe cannot pull in nvim-cmp early, and prose completion
+still offers only buffer words and paths. Rendering updates use a 50 ms debounce.
+
+The shell's `n` command opens the note with the regular configuration; no separate
+"fast mode", reduced-functionality editor, or extra plugin is needed.
+
 ## Editing behavior
 
 - `<leader>z` toggles prose mode for the current buffer, including all its splits.
@@ -94,7 +128,10 @@ the plugin lockfile does not manage them.
   the filetype default. Existing mappings and window settings are restored when
   the mode relinquishes them; changes made by another owner are not overwritten
   during restoration.
-- `<leader>m` toggles Markdown rendering independently of prose mode.
+- Markdown stays rendered in Normal and command-line modes, including the cursor
+  line. Headings hide their hash markers and use full-width shaded backgrounds.
+  Insert and Visual modes show raw markup; Esc restores the rendered view.
+  `<leader>m` (Space, then m) toggles rendering independently of prose mode.
 - `<leader>f` formats the current Python buffer synchronously with Ruff, with a
   two-second timeout. It does not format on save or apply delayed asynchronous
   formatting edits.
@@ -105,35 +142,34 @@ the plugin lockfile does not manage them.
 
 ## Writing theme
 
-The default `forest` theme is a soft, Everforest-inspired dark palette matching
-the current WezTerm configuration at `~/.config/wezterm/wezterm.lua`. It uses a
-charcoal-green background (`#2d353b`), warm text (`#d3c6aa`), and muted green,
-teal, gold, and rose accents for code. Normal text has approximately 7.4:1
-contrast; comments remain readable rather than fading into the background.
-Headings use weight instead of bright colors, with subtle backgrounds for code
-and completion menus. Spelling feedback stays underlined, without recoloring
-the whole word.
+The default `tokyonight-moon` theme uses Tokyo Night Moon's deep navy background
+(`#222436`), soft blue-white text (`#c8d3f5`), and clear blue, cyan, green,
+yellow, purple, and red accents. It matches the current WezTerm configuration at
+`~/.config/wezterm/wezterm.lua`, retaining strong contrast for normal text,
+comments, menus, selections, and rendered Markdown.
 
-Normal/Visual mode uses a steady sage-green block (`#a7c080`) with dark text
-(`#2d353b`) so the character under the cursor remains readable. Insert mode uses
-a warm light bar (`#d3c6aa`). Cursor, selection, and all 16 ANSI colors match
-WezTerm. Terminal rendering controls the bar's actual thickness; Neovim's
-`guicursor` percentage widths apply to GUIs, not terminal cursor protocols.
+Normal/Visual mode uses a steady blue-white block (`#c8d3f5`) with dark text so
+the character under the cursor remains readable. Insert mode uses a bright blue
+bar (`#82aaff`). Cursor, selection, and all 16 ANSI colors match WezTerm. The
+normal ANSI blue is deliberately darker than the syntax accent because
+PowerShell renders directories as light text on an ANSI-blue background.
+Terminal rendering controls the bar's actual thickness; Neovim's `guicursor`
+percentage widths apply to GUIs, not terminal cursor protocols.
 
-`colors/forest.lua` and the light alternative `colors/paper.lua` use the shared
-highlight definitions in `lua/config/theme.lua`, built on Neovim's bundled
-`quiet` theme. No new plugins or runtime dependency on a terminal configuration
-are needed; the colors work on macOS and Windows. Fonts and terminal settings
-are unchanged.
+`colors/tokyonight-moon.lua`, `colors/forest.lua`, and `colors/paper.lua` use
+the shared highlight definitions in `lua/config/theme.lua`, built on Neovim's
+bundled `quiet` theme. No new plugins or runtime dependency on a terminal
+configuration are needed; the colors work on macOS and Windows. Fonts and
+terminal settings are unchanged.
 
-Use `:colorscheme forest` to apply the dark theme immediately, or restart Neovim.
-`:colorscheme paper` selects the previous warm-white theme for the current
-session. To make Paper the default again, change the colorscheme in `init.lua`.
-The existing Ghostty Paper theme is unchanged and still matches the light option,
-not Forest.
+Use `:colorscheme tokyonight-moon` to apply the default theme immediately, or
+restart Neovim. `:colorscheme forest` selects the previous Everforest-inspired
+dark palette, and `:colorscheme paper` selects the warm-white palette for the
+current session. To change the default, update the colorscheme in `init.lua`.
+The existing Ghostty Paper theme is unchanged and still matches the light option.
 
-The theme regression script covers both palettes. Optionally compare the local
-WezTerm configuration with Forest, or the Ghostty theme with Paper:
+The theme regression script covers all three palettes. Optionally compare the
+local WezTerm configuration with Tokyo Night Moon, or the Ghostty theme with Paper:
 
 ```sh
 nvim --headless -u NONE -l tests/theme.lua --wezterm="$HOME/.config/wezterm/wezterm.lua"
