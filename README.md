@@ -1,10 +1,14 @@
 # WezTerm configuration
 
-A muted, Everforest-inspired dark theme for writing and coding, with JetBrains
-Mono at 13 pt, gentle line spacing, and 50,000 lines of scrollback. The font is
-bundled with WezTerm on macOS and Windows; no separate font installation is
-required. Shortcuts adapt to macOS or Windows/Linux without changing your
-default shell, shell environment, or normal Neovim theme.
+A dark Tokyo Night Moon theme for writing and coding, with a deep navy
+background, blue-white text, distinct syntax and terminal accents, JetBrains Mono
+at 13 pt, gentle line spacing, and 50,000 lines of scrollback. PowerShell
+directory backgrounds use a darker ANSI blue so their light labels remain easy
+to read. The palette matches the default theme in the sibling Neovim
+configuration. The font is bundled with WezTerm on macOS and Windows; no
+separate font installation is required. Shortcuts adapt to macOS or
+Windows/Linux. Windows launches PowerShell 7; macOS/Linux retain their default
+shell. Shell environments are unchanged.
 
 ## Setup
 
@@ -32,6 +36,7 @@ winget install --id wez.wezterm --exact
 winget install --id Git.Git --exact
 winget install --id GitHub.cli --exact
 winget install --id Neovim.Neovim --exact
+winget install --id Microsoft.PowerShell --exact
 ```
 
 Open a new PowerShell window so the installed programs are on PATH, then clone
@@ -44,9 +49,10 @@ gh repo clone hariscats/wezterm "$HOME\.config\wezterm"
 ```
 
 Restart WezTerm after installing Neovim so it inherits the updated PATH.
-Neovim is only needed for the scrollback viewer. The default Windows shell is
-unchanged (normally Command Prompt); this config does not select PowerShell or
-WSL automatically.
+Neovim is only needed for the scrollback viewer. New local Windows tabs and
+windows launch `C:\Program Files\PowerShell\7\pwsh.exe -NoLogo`, using the stable
+PowerShell 7 installation path instead of CMD or an ambiguous PATH lookup.
+Your PowerShell profile still loads normally; WSL is not selected automatically.
 
 Saved configuration edits reload automatically. No terminal plugins are required.
 

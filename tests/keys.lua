@@ -102,12 +102,20 @@ for _, target in ipairs(targets) do
     assert(config.send_composed_key_when_left_alt_is_pressed == nil)
     assert(config.send_composed_key_when_right_alt_is_pressed == nil)
   end
-  assert(config.default_prog == nil and config.default_domain == nil)
+  if target:find("windows", 1, true) then
+    assert(#config.default_prog == 2)
+    assert(config.default_prog[1] == [[C:\Program Files\PowerShell\7\pwsh.exe]])
+    assert(config.default_prog[2] == "-NoLogo")
+  else
+    assert(config.default_prog == nil)
+  end
+  assert(config.default_domain == nil)
   assert(config.set_environment_variables == nil)
   assert(config.disable_default_key_bindings == nil)
   assert(config.font.family == "JetBrains Mono" and config.font_size == 13)
   assert(config.line_height == 1.08 and config.scrollback_lines == 50000)
-  assert(config.colors.background == "#2d353b")
+  assert(config.colors.background == "#222436")
+  assert(config.colors.ansi[5] == "#2f436e")
 end
 
 print("Platform shortcuts: " .. #targets .. " targets passed")

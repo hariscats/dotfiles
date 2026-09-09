@@ -3,23 +3,27 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 local is_macos = wezterm.target_triple:find("apple-darwin", 1, true) ~= nil
 
--- A soft, Everforest-inspired dark palette for prose and code.
+if wezterm.target_triple:find("windows", 1, true) then
+  config.default_prog = { [[C:\Program Files\PowerShell\7\pwsh.exe]], "-NoLogo" }
+end
+
+-- Tokyo Night Moon, with a dark ANSI blue for PowerShell directory backgrounds.
 local palette = {
-  bg = "#2d353b",
-  fg = "#d3c6aa",
-  cursor = "#a7c080",
-  insert_cursor = "#d3c6aa",
-  muted = "#9da9a0",
-  panel = "#272e33",
-  border = "#4f585e",
-  selection = "#425047",
-  search = "#4f5144",
-  red = "#e67e80",
-  green = "#a7c080",
-  yellow = "#dbbc7f",
-  blue = "#7fbbb3",
-  purple = "#d699b6",
-  cyan = "#83c092",
+  bg = "#222436",
+  fg = "#c8d3f5",
+  cursor = "#c8d3f5",
+  insert_cursor = "#82aaff",
+  muted = "#828bb8",
+  panel = "#1e2030",
+  border = "#636da6",
+  selection = "#2f334d",
+  search = "#34548a",
+  red = "#ff757f",
+  green = "#c3e88d",
+  yellow = "#ffc777",
+  blue = "#82aaff",
+  purple = "#c099ff",
+  cyan = "#86e1fc",
 }
 
 config.colors = {
@@ -35,12 +39,12 @@ config.colors = {
   split = palette.border,
   compose_cursor = palette.yellow,
   ansi = {
-    "#475258", palette.red, palette.green, palette.yellow,
-    palette.blue, palette.purple, palette.cyan, palette.fg,
+    "#1b1d2b", palette.red, palette.green, palette.yellow,
+    "#2f436e", palette.purple, palette.cyan, palette.muted,
   },
   brights = {
-    palette.muted, palette.red, palette.green, palette.yellow,
-    palette.blue, palette.purple, palette.cyan, "#e6ddcb",
+    "#444a73", palette.red, palette.green, palette.yellow,
+    palette.blue, palette.purple, palette.cyan, palette.fg,
   },
   copy_mode_active_highlight_bg = { Color = palette.search },
   copy_mode_active_highlight_fg = { Color = palette.fg },
@@ -52,7 +56,7 @@ config.colors = {
   quick_select_match_fg = { Color = palette.fg },
   tab_bar = {
     background = palette.panel,
-    active_tab = { bg_color = palette.bg, fg_color = palette.fg, intensity = "Bold" },
+    active_tab = { bg_color = palette.blue, fg_color = palette.bg, intensity = "Bold" },
     inactive_tab = { bg_color = palette.panel, fg_color = palette.muted },
     inactive_tab_hover = { bg_color = palette.selection, fg_color = palette.fg },
   },
@@ -102,7 +106,7 @@ local mods = {
   resize = is_macos and "CMD|CTRL" or "CTRL|SHIFT|ALT",
 }
 
--- Keep the default shell, environment, and editor shortcuts intact.
+-- Keep the shell environment and editor shortcuts intact.
 -- Splits use the current domain and WezTerm's working-directory inheritance.
 config.keys = {
   { key = "d", mods = mods.primary, action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
