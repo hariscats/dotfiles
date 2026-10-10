@@ -1,3 +1,3 @@
 # WezTerm configuration
 
-Uses WezTerm defaults with the Catppuccin Mocha color scheme to match Neovim.
+Uses the Everforest Dark (medium) palette to match Neovim, with readability tweaks, quiet settings, and Ctrl+Alt+N to open Neovim in `~/notes/`.
